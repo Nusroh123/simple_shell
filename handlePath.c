@@ -50,7 +50,7 @@ char *getPathLocation(char *buffer)
 			_strcat(filePath, buffer);
 			if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
 			{
-				/**free(pathCopy);**/
+				free(pathCopy);
 				return (filePath);
 			}
 			else
