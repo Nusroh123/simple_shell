@@ -42,7 +42,6 @@ int main(int ac, char *tok[], char **env)
 			pathBuffer = getPathLocation(buffer);
 			if (pathBuffer)
 			{
-				printf("%s\n", pathBuffer);
 				childPid = fork();
 				if (childPid < 0)
 				{
