@@ -29,7 +29,7 @@ char *getPathLocation(char *buffer)
 	i = 0;
 	for (i = 0; environ[i] != NULL; i++)
 	{
-		if (strncmp(environ[i], "PATH=", 5) == 0)
+		if (_strncmp(environ[i], "PATH=", 5) == 0)
 		{
 			path = environ[i] + 5; /** skip "PATH="**/
 		}
@@ -37,20 +37,20 @@ char *getPathLocation(char *buffer)
 
 	if (path)
 	{
-		pathCopy = strdup(path);
-		bufferLen = strlen(buffer);
+		pathCopy = _strdup(path);
+		bufferLen = _strlen(buffer);
 		pathToken = strtok(pathCopy, ":");
 
 		while (pathToken != NULL)
 		{
-			pathLen = strlen(pathToken);
+			pathLen = _strlen(pathToken);
 			filePath = malloc(bufferLen + pathLen + 2);
-			strcpy(filePath, pathToken);
-			strcat(filePath, "/");
-			strcat(filePath, buffer);
+			_strcpy(filePath, pathToken);
+			_strcat(filePath, "/");
+			_strcat(filePath, buffer);
 			if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
 			{
-				free(pathCopy);
+				/**free(pathCopy);**/
 				return (filePath);
 			}
 			else

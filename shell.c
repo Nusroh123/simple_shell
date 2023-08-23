@@ -1,25 +1,30 @@
 #include "main.h"
-int main(int ac, char *tok[], char **env)
+/**
+ * main - entry point
+ * @ac: argument count
+ * @tok: argument variable
+ * @env: environment variable
+ * Return: 0 on success
+ */
+int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
-	char *buffer, *pathBuffer;
+	char *buffer;
 	size_t charNum;
-	int i, j, status;
-	pid_t childPid;
+	int i, j;
 
 	i = 0;
 	j = 0;
 	buffer = NULL;
-	pathBuffer = NULL;
 	charNum = 0;
-	(void)ac;
-	betty();
 	while (1)
 	{
 		if (isatty(STDIN_FILENO) != 0)/**check if it is interactive i.e not piped**/
 			write(STDOUT_FILENO, "> ", 3);/**Prompt**/
-
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
+		{
+			free(buffer);
 			continue;
+		}
 		while (buffer[j])/**Remove newline character**/
 		{
 			if (buffer[j] == '\n')
@@ -34,39 +39,53 @@ int main(int ac, char *tok[], char **env)
 			i++;
 			tok[i] = strtok(NULL, " \n");
 		}
-
 		if (i > 0)
 		{
 			tok[i] = NULL;
-
-			pathBuffer = getPathLocation(buffer);
-			if (pathBuffer)
-			{
-				childPid = fork();
-				if (childPid < 0)
-				{
-					perror("fork failed");
-					continue;
-				}
-				else if (childPid == 0)
-				{
-					if (execve(pathBuffer, tok, env) == -1)
-					{
-						perror("execve failed");
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					wait(&status);
-				}
-				free(pathBuffer);
-			}
-			else
-				perror("Command not found");
+			executePath(buffer, tok, env);
 		}
+		else
+			perror("Command not found");
 	}
-	fflush(stdout);/*Display the content of buffer b4 storing another one*/
-	free(buffer);
+	fflush(stdout);/**Display the content of buffer b4 storing another one**/
 	return (0);
+}
+
+
+/**
+ * executePath - execute Path
+ * @buffer: command inputted
+ * Return: nothing
+*/
+void executePath(char *buffer, char *tok[], char **env)
+{
+	char *pathBuffer;
+	pid_t childPid;
+	int status;
+
+	pathBuffer = NULL;
+
+	pathBuffer = getPathLocation(buffer);
+	if (pathBuffer)
+	{
+		childPid = fork();
+		if (childPid < 0)
+		{
+			perror("fork failed");
+			/**continue;**/
+		}
+		else if (childPid == 0)
+		{
+			if (execve(pathBuffer, tok, env) == -1)
+			{
+				perror("execve failed");
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			wait(&status);
+		}
+		/**free(pathBuffer);**/
+	}
 }
