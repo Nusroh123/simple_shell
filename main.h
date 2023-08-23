@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 
 extern char **environ;
-int betty(void);
 int shell(void);
 void nonIShell(int argc, char *argv[] __attribute__((unused)));
 void processIS(char *line);
@@ -22,5 +21,6 @@ char *_strcat(char *dest, char *src);
 char *_strcpy(char *dest, char *src);
 char *_strdup(char *str);
 int _strlen(char *s);
-
+char *getPath(char *buffer, char *pathCopy);
+char *createFilePath(char *directory, char *command);
 #endif

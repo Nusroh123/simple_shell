@@ -10,27 +10,23 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
 	char *buffer;
 	size_t charNum;
-	int i, j;
+	int i;
 
 	i = 0;
-	j = 0;
 	buffer = NULL;
 	charNum = 0;
 	while (1)
 	{
 		if (isatty(STDIN_FILENO) != 0)/**check if it is interactive i.e not piped**/
 			write(STDOUT_FILENO, "> ", 3);/**Prompt**/
+
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
 		{
 			free(buffer);
 			continue;
 		}
-		while (buffer[j])/**Remove newline character**/
-		{
-			if (buffer[j] == '\n')
-				buffer[j] = 0;
-			j++;
-		}
+		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
+			buffer[_strlen(buffer) - 1] = '\0';
 
 		tok[0] = strtok(buffer, " \n");/**Tokenize input**/
 		i = 0;
@@ -47,6 +43,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		else
 			perror("Command not found");
 	}
+	free(buffer);
 	fflush(stdout);/**Display the content of buffer b4 storing another one**/
 	return (0);
 }
@@ -55,6 +52,8 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 /**
  * executePath - execute Path
  * @buffer: command inputted
+ * @tok: argument vector
+ * @env: environment variable
  * Return: nothing
 */
 void executePath(char *buffer, char *tok[], char **env)

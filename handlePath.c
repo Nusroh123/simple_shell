@@ -4,29 +4,15 @@
  * getPathLocation - Gets the path of the inputted command
  * @buffer: a temporary storage for the inputted command
  * Return: Nothing
- *
- * Trying to handle path...
- * path gets the environment
- * pathCopy duplicates path
- * bufferLen get the length of the command(buffer)
- * pathToken breaks down the path into token
- * pathLen gets the length of each token
- * Create a file to hold the full length (filePath)
- * in a while loop:
- * copy pathToken into filePath i.e /bin
- * concatenate "/" i.e /bin/
- * concatenate the command(buffer) i.e /bin/ls
- *
  */
 char *getPathLocation(char *buffer)
 {
-	char *path, *pathCopy, *pathToken, *filePath;
-	int bufferLen, pathLen, i;
+	char *path, *pathCopy, *result;
+	int i;
 	struct stat statBuf;
 
-	filePath = NULL;
-
 	i = 0;
+	result = NULL;
 	for (i = 0; environ[i] != NULL; i++)
 	{
 		if (_strncmp(environ[i], "PATH=", 5) == 0)
@@ -34,37 +20,79 @@ char *getPathLocation(char *buffer)
 			path = environ[i] + 5; /** skip "PATH="**/
 		}
 	}
-
 	if (path)
 	{
 		pathCopy = _strdup(path);
-		bufferLen = _strlen(buffer);
-		pathToken = strtok(pathCopy, ":");
-
-		while (pathToken != NULL)
-		{
-			pathLen = _strlen(pathToken);
-			filePath = malloc(bufferLen + pathLen + 2);
-			_strcpy(filePath, pathToken);
-			_strcat(filePath, "/");
-			_strcat(filePath, buffer);
-			if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
-			{
-				free(pathCopy);
-				return (filePath);
-			}
-			else
-			{
-				free(filePath);
-				pathToken = strtok(NULL, ":");
-			}
-		}
+		result = getPath(buffer, pathCopy);
 		free(pathCopy);
-		if (stat(buffer, &statBuf) == 0)
-		{
-			return (buffer);
-		}
-		return (NULL);
 	}
-	return (NULL);
+	if (result == NULL && stat(buffer, &statBuf) == 0)
+	{
+		result = _strdup(buffer);
+	}
+	return (result);
+}
+
+/**
+ * getPath - get path;
+ * @buffer: command inputted
+ * Return: Nothing
+ */
+char *getPath(char *buffer, char *pathCopy)
+{
+	char *pathToken, *filePath, *result;
+	int bufferLen, pathLen;
+	struct stat statBuf;
+
+	filePath = NULL;
+	result = NULL;
+
+	bufferLen = _strlen(buffer);
+	pathToken = strtok(pathCopy, ":");
+
+	while (pathToken != NULL)
+	{
+		pathLen = _strlen(pathToken);
+		filePath = malloc(bufferLen + pathLen + 2);
+		_strcpy(filePath, pathToken);
+		_strcat(filePath, "/");
+		_strcat(filePath, buffer);
+		if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
+
+		{
+			result = filePath;
+			break;
+		}
+		else
+		{
+			free(filePath);
+			pathToken = strtok(NULL, ":");
+		}
+	}
+	return (result);
+}
+
+/**
+ * createFilePath - create a full path by concatenating directory and command
+ * @directory: directory from PATH
+ * @command: command to execute
+ * Return: the full path
+ */
+char *createFilePath(char *directory, char *command)
+{
+	int pathLen = _strlen(directory);
+	int commandLen = _strlen(command);
+	char *filePath = malloc(pathLen + commandLen + 2);
+
+	if (filePath == NULL)
+	{
+		perror("malloc failed");
+		exit(EXIT_FAILURE);
+	}
+
+	_strcpy(filePath, directory);
+	_strcat(filePath, "/");
+	_strcat(filePath, command);
+
+	return (filePath);
 }
