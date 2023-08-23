@@ -36,6 +36,7 @@ char *getPathLocation(char *buffer)
 /**
  * getPath - get path;
  * @buffer: command inputted
+ * @pathCopy: make a copy of path
  * Return: Nothing
  */
 char *getPath(char *buffer, char *pathCopy)

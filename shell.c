@@ -44,6 +44,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 			perror("Command not found");
 	}
 	free(buffer);
+	buffer = NULL;
 	fflush(stdout);/**Display the content of buffer b4 storing another one**/
 	return (0);
 }
