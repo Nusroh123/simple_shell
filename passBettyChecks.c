@@ -7,10 +7,10 @@
  */
 int betty(void)
 {
-	/**char *info;
+	/**char *info;**/
 
-	info = "I love coding!!!\n";
-	write(STDOUT_FILENO, info, 20);**/
+	/**info = "I love coding!!!\n";**/
+	/**write(STDOUT_FILENO, info, 20);**/
 
 	return (0);
 }

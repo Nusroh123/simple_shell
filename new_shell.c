@@ -1,5 +1,4 @@
 #include "main.h"
-void implementExit();
 int main(int ac, char *tok[], char **env)
 {
 	char *buffer, *pathBuffer;
@@ -21,7 +20,6 @@ int main(int ac, char *tok[], char **env)
 
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
 			continue;
-		
 		while (buffer[j])/**Remove newline character**/
 		{
 			if (buffer[j] == '\n')
@@ -30,11 +28,6 @@ int main(int ac, char *tok[], char **env)
 		}
 
 		tok[0] = strtok(buffer, " \n");/**Tokenize input**/
-		/**if (strcmp(tok[0], "exit") == 0)
-                {
-                        implementExit();
-			break;
-                }**/
 		i = 0;
 		while (tok[i])/**i.e tok[i] != '\0'**/
 		{
@@ -78,15 +71,3 @@ int main(int ac, char *tok[], char **env)
 	free(buffer);
 	return (0);
 }
-
-/**
- * implementExit - exit the program 
- * buffer: a temporay storage for inputted commands
- * Return: Nothing
- */
-
-/**void implementExit()
-{
-	perror("Exiting the Shell...\n");
-	exit(0);
-}**/

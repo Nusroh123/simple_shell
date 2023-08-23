@@ -45,16 +45,12 @@ char *getPathLocation(char *buffer)
 		{
 			pathLen = strlen(pathToken);
 			filePath = malloc(bufferLen + pathLen + 2);
-			
 			strcpy(filePath, pathToken);
 			strcat(filePath, "/");
 			strcat(filePath, buffer);
-
-			
 			if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
 			{
 				free(pathCopy);
-				/**free(filePath);**/
 				return (filePath);
 			}
 			else
@@ -62,12 +58,10 @@ char *getPathLocation(char *buffer)
 				free(filePath);
 				pathToken = strtok(NULL, ":");
 			}
-			
 		}
 		free(pathCopy);
 		if (stat(buffer, &statBuf) == 0)
 		{
-			/**free(filePath);**/
 			return (buffer);
 		}
 		return (NULL);
