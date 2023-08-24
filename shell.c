@@ -23,7 +23,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
 		{
 			free(buffer);
-			continue;
+			exit(EXIT_FAILURE);
 		}
 		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
 			buffer[_strlen(buffer) - 1] = '\0';
@@ -43,7 +43,6 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		else
 			perror("Command not found");
 	}
-	free(buffer);
 	buffer = NULL;
 	fflush(stdout);/**Display the content of buffer b4 storing another one**/
 	return (0);
@@ -72,7 +71,7 @@ void executePath(char *buffer, char *tok[], char **env)
 		if (childPid < 0)
 		{
 			perror("fork failed");
-			/**continue;**/
+			free(pathBuffer);
 		}
 		else if (childPid == 0)
 		{
@@ -85,6 +84,8 @@ void executePath(char *buffer, char *tok[], char **env)
 		else
 		{
 			wait(&status);
+			free(pathBuffer);
+			/**free(buffer);**/
 		}
 		/**free(pathBuffer);**/
 	}

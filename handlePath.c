@@ -11,6 +11,7 @@ char *getPathLocation(char *buffer)
 	int i;
 	struct stat statBuf;
 
+	path = NULL;
 	i = 0;
 	result = NULL;
 	for (i = 0; environ[i] != NULL; i++)
@@ -42,22 +43,15 @@ char *getPathLocation(char *buffer)
 char *getPath(char *buffer, char *pathCopy)
 {
 	char *pathToken, *filePath, *result;
-	int bufferLen, pathLen;
 	struct stat statBuf;
 
 	filePath = NULL;
 	result = NULL;
-
-	bufferLen = _strlen(buffer);
 	pathToken = strtok(pathCopy, ":");
 
 	while (pathToken != NULL)
 	{
-		pathLen = _strlen(pathToken);
-		filePath = malloc(bufferLen + pathLen + 2);
-		_strcpy(filePath, pathToken);
-		_strcat(filePath, "/");
-		_strcat(filePath, buffer);
+		filePath = createFilePath(pathToken, buffer);
 		if (stat(filePath, &statBuf) == 0 && filePath[1] != 'u')/*i.e successful*/
 
 		{
