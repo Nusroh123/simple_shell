@@ -62,7 +62,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 /**
  * executePath - execute Path
  * @buffer: command inputted
- * @tok: argument vector
+ * @argvTok: argument vector
  * @env: environment variable
  * Return: nothing
  */
