@@ -38,7 +38,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		{
 			free(buffer);
 			buffer = NULL;
-			break;
+			exit(2);
 		}
 		token = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
