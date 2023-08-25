@@ -1,6 +1,6 @@
 #include "main.h"
 
-void executePath(char *buffer, char *tok[], char **env);
+void executePath(char *buffer, char *argvTok[], char **env);
 /**
  * main - entry point
  * @ac: argument count
@@ -10,13 +10,11 @@ void executePath(char *buffer, char *tok[], char **env);
  */
 int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
-	char *buffer, *argvTok[64];
+	char *buffer = NULL, *argvTok[64], *token = NULL;
 	size_t charNum;
-	int i;
+	int i = 0;
 
-	i = 0;
-	buffer = NULL;
-	charNum = 0;
+	(void)tok;
 	while (1)
 	{
 		if (isatty(STDIN_FILENO) != 0)/**check if it is interactive i.e not piped**/
@@ -30,13 +28,13 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
 			buffer[_strlen(buffer) - 1] = '\0';
 
-		tok[0] = strtok(buffer, " \n\t\r");/**Tokenize input**/
+		token = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
-		while (tok[i])/**i.e tok[i] != '\0'**/
+		while (token)/**i.e tok[i] != '\0'**/
 		{
-			argvTok[i] = tok[i];
+			argvTok[i] = token;
 			i++;
-			tok[i] = strtok(NULL, " \n\t\r");
+			token = strtok(NULL, " \n\t\r");
 		}
 		argvTok[i] = NULL;
 
@@ -68,7 +66,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
  * @env: environment variable
  * Return: nothing
  */
-void executePath(char *buffer, char *tok[], char **env)
+void executePath(char *buffer, char *argvTok[], char **env)
 {
 	char *pathBuffer;
 	pid_t childPid;
@@ -88,7 +86,7 @@ void executePath(char *buffer, char *tok[], char **env)
 		}
 		else if (childPid == 0)
 		{
-			if (execve(pathBuffer, tok, env) == -1)
+			if (execve(pathBuffer, argvTok, env) == -1)
 			{
 				free(pathBuffer);
 				pathBuffer = NULL;
