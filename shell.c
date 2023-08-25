@@ -78,7 +78,6 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		free(buffer);
 		buffer = NULL;
 	}
-	exit(2);
 	return (0);
 }
 
@@ -98,30 +97,39 @@ void executePath(char *buffer, char *argvTok[], char **env)
 	pathBuffer = NULL;
 
 	pathBuffer = getPathLocation(buffer);
-	if (access(pathBuffer, X_OK) == 0)
+	if (pathBuffer != NULL)
 	{
-		childPid = fork();
-		if (childPid < 0)
+		if (access(pathBuffer, X_OK) == 0)
 		{
-			free(pathBuffer);
-			pathBuffer = NULL;
-			exit(EXIT_FAILURE);
-		}
-		else if (childPid == 0)
-		{
-			if (execve(pathBuffer, argvTok, env) == -1)
+			childPid = fork();
+			if (childPid < 0)
 			{
 				free(pathBuffer);
 				pathBuffer = NULL;
-				perror("execve failed");
 				exit(EXIT_FAILURE);
+			}
+			else if (childPid == 0)
+			{
+				if (execve(pathBuffer, argvTok, env) == -1)
+				{
+					free(pathBuffer);
+					pathBuffer = NULL;
+					perror("execve failed");
+					exit(EXIT_FAILURE);
+				}
+			}
+			else
+			{
+				wait(&status);
+				free(pathBuffer);
+				pathBuffer = NULL;
 			}
 		}
 		else
 		{
-			wait(&status);
 			free(pathBuffer);
 			pathBuffer = NULL;
+			return;
 		}
 	}
 	else
