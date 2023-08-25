@@ -28,8 +28,12 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
 			buffer[_strlen(buffer) - 1] = '\0';
 
-		if (strcmp(buffer, "exit") == 0)
+		if (_strcmp(buffer, "exit") == 0)
+		{
+			free(buffer);
+			buffer = NULL;
 			exit(0);
+		}
 		token = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
 		while (token)/**i.e tok[i] != '\0'**/
