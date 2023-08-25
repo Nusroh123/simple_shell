@@ -1,4 +1,6 @@
 #include "main.h"
+
+void executePath(char *buffer, char *tok[], char **env);
 /**
  * main - entry point
  * @ac: argument count
@@ -8,7 +10,7 @@
  */
 int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
-	char *buffer;
+	char *buffer, *argvTok[64];
 	size_t charNum;
 	int i;
 
@@ -19,32 +21,42 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 	{
 		if (isatty(STDIN_FILENO) != 0)/**check if it is interactive i.e not piped**/
 			write(STDOUT_FILENO, "> ", 3);/**Prompt**/
-
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
 		{
 			free(buffer);
-			exit(EXIT_FAILURE);
+			buffer = NULL;
+			exit(0);
 		}
 		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
 			buffer[_strlen(buffer) - 1] = '\0';
 
-		tok[0] = strtok(buffer, " \n");/**Tokenize input**/
+		tok[0] = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
 		while (tok[i])/**i.e tok[i] != '\0'**/
 		{
+			argvTok[i] = tok[i];
 			i++;
-			tok[i] = strtok(NULL, " \n");
+			tok[i] = strtok(NULL, " \n\t\r");
 		}
+		argvTok[i] = NULL;
+
 		if (i > 0)
 		{
-			tok[i] = NULL;
-			executePath(buffer, tok, env);
+			executePath(buffer, argvTok, env);
 		}
+
 		else
-			perror("Command not found");
+		{
+			if (buffer)
+			{
+				free(buffer);
+				buffer = NULL;
+			}
+		}
+		fflush(stdout);/**Display the content of buffer b4 storing another one**/
+		free(buffer);
+		buffer = NULL;
 	}
-	buffer = NULL;
-	fflush(stdout);/**Display the content of buffer b4 storing another one**/
 	return (0);
 }
 
@@ -55,7 +67,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
  * @tok: argument vector
  * @env: environment variable
  * Return: nothing
-*/
+ */
 void executePath(char *buffer, char *tok[], char **env)
 {
 	char *pathBuffer;
@@ -70,13 +82,16 @@ void executePath(char *buffer, char *tok[], char **env)
 		childPid = fork();
 		if (childPid < 0)
 		{
-			perror("fork failed");
 			free(pathBuffer);
+			pathBuffer = NULL;
+			exit(EXIT_FAILURE);
 		}
 		else if (childPid == 0)
 		{
 			if (execve(pathBuffer, tok, env) == -1)
 			{
+				free(pathBuffer);
+				pathBuffer = NULL;
 				perror("execve failed");
 				exit(EXIT_FAILURE);
 			}
@@ -85,8 +100,7 @@ void executePath(char *buffer, char *tok[], char **env)
 		{
 			wait(&status);
 			free(pathBuffer);
-			/**free(buffer);**/
+			pathBuffer = NULL;
 		}
-		/**free(pathBuffer);**/
 	}
 }
