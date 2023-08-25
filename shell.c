@@ -11,9 +11,9 @@ void signalHandler(int sig);
  */
 int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
-	char *buffer = NULL, *argvTok[64], *token = NULL;
+	char *buffer = NULL, *argvTok[64], *token = NULL, *command = "bin/ls";
 	size_t charNum;
-	int i = 0;
+	int i = 0, lsCount = 0;
 	struct sigaction sa;
 
 	memset(&sa, 0, sizeof(sa));
@@ -53,6 +53,8 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		if (i > 0)
 		{
 			executePath(buffer, argvTok, env);
+			if (_strcmp(argvTok[0], command) == 0)
+				lsCount++;
 		}
 
 		else
