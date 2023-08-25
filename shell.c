@@ -12,7 +12,7 @@ void executeEnv(char **env);
  */
 int main(int ac __attribute__((unused)), char *tok[], char **env)
 {
-	char *buffer = NULL, *argvTok[64], *token = NULL, *command = "bin/ls";
+	char *buffer = NULL, *argvTok[128], *token = NULL, *command = "bin/ls";
 	size_t charNum;
 	int i = 0, lsCount = 0;
 	struct sigaction sa;
@@ -25,7 +25,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 	while (1)
 	{
 		if (isatty(STDIN_FILENO) != 0)/**check if it is interactive i.e not piped**/
-			write(STDOUT_FILENO, "> ", 3);/**Prompt**/
+			write(STDOUT_FILENO, "$ ", 3);/**Prompt*/
 		if (getline(&buffer, &charNum, stdin) == -1)/**Handles EOF, no more input**/
 		{
 			free(buffer);
@@ -35,14 +35,11 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		if (_strlen(buffer) > 0 && buffer[_strlen(buffer) - 1] == '\n')
 			buffer[_strlen(buffer) - 1] = '\0';
 
-		if (_strcmp(buffer, "exit") == 0)
-		{
-			free(buffer);
-			buffer = NULL;
-			exit(0);
-		}
 		token = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
+		if (token == NULL)
+			continue;
+
 		while (token)/**i.e tok[i] != '\0'**/
 		{
 			argvTok[i] = token;
@@ -50,6 +47,12 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 			token = strtok(NULL, " \n\t\r");
 		}
 		argvTok[i] = NULL;
+		if (_strcmp(argvTok[0], "exit") == 0)
+		{
+			free(buffer);
+			buffer = NULL;
+			exit(0);
+		}
 		if (_strcmp(argvTok[0], "env") == 0)
 		{
 			executeEnv(env);
@@ -95,7 +98,7 @@ void executePath(char *buffer, char *argvTok[], char **env)
 	pathBuffer = NULL;
 
 	pathBuffer = getPathLocation(buffer);
-	if (pathBuffer)
+	if (access(pathBuffer, X_OK) == 0)
 	{
 		childPid = fork();
 		if (childPid < 0)
@@ -120,6 +123,12 @@ void executePath(char *buffer, char *argvTok[], char **env)
 			free(pathBuffer);
 			pathBuffer = NULL;
 		}
+	}
+	else
+	{
+		free(pathBuffer);
+		pathBuffer = NULL;
+		return;
 	}
 }
 /**
