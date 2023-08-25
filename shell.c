@@ -2,6 +2,7 @@
 
 void executePath(char *buffer, char *argvTok[], char **env);
 void signalHandler(int sig);
+void executeEnv(char **env);
 /**
  * main - entry point
  * @ac: argument count
@@ -49,6 +50,11 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 			token = strtok(NULL, " \n\t\r");
 		}
 		argvTok[i] = NULL;
+		if (_strcmp(argvTok[0], "env") == 0)
+		{
+			executeEnv(env);
+			continue;
+		}
 
 		if (i > 0)
 		{
@@ -72,7 +78,6 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 	exit(2);
 	return (0);
 }
-
 
 /**
  * executePath - execute Path
@@ -130,3 +135,24 @@ void signalHandler(int sig)
 	}
 }
 
+/**
+ * executeEnv - execute environment variable
+ * @env: environment variable
+ * Return: nothing
+ */
+void executeEnv(char **env)
+{
+	int i = 0, j;
+
+	while (env[i] != NULL)
+	{
+		j = 0;
+		while (env[i][j] != '\0')
+		{
+			write(STDOUT_FILENO, &env[i][j], 1);
+			j++;
+		}
+		write(STDOUT_FILENO, "\n", 1);
+		i++;
+	}
+}
