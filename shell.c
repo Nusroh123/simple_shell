@@ -78,6 +78,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		free(buffer);
 		buffer = NULL;
 	}
+	exit(2);
 	return (0);
 }
 
