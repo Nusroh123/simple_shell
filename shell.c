@@ -1,6 +1,7 @@
 #include "main.h"
 
 void executePath(char *buffer, char *argvTok[], char **env);
+void signalHandler(int sig);
 /**
  * main - entry point
  * @ac: argument count
@@ -13,7 +14,12 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 	char *buffer = NULL, *argvTok[64], *token = NULL;
 	size_t charNum;
 	int i = 0;
+	struct sigaction sa;
 
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = signalHandler;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 	(void)tok;
 	while (1)
 	{
@@ -29,11 +35,7 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 			buffer[_strlen(buffer) - 1] = '\0';
 
 		if (_strcmp(buffer, "exit") == 0)
-		{
-			free(buffer);
-			buffer = NULL;
-			exit(0);
-		}
+			break;
 		token = strtok(buffer, " \n\t\r");/**Tokenize input**/
 		i = 0;
 		while (token)/**i.e tok[i] != '\0'**/
@@ -108,3 +110,16 @@ void executePath(char *buffer, char *argvTok[], char **env)
 		}
 	}
 }
+/**
+ * signalHandler - handler signal during exit
+ * @sig: sigal number
+ * Return: Nothing
+ */
+void signalHandler(int sig)
+{
+	if (sig == SIGINT || sig == SIGTERM)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+	}
+}
+
