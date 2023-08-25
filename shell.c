@@ -66,8 +66,8 @@ int main(int ac __attribute__((unused)), char *tok[], char **env)
 		fflush(stdout);/**Display the content of buffer b4 storing another one**/
 		free(buffer);
 		buffer = NULL;
-		exit(2);
 	}
+	exit(2);
 	return (0);
 }
 
